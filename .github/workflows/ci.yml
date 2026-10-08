@@ -43,3 +43,6 @@ jobs:
           PYTHONPATH: src
         run: |
           pytest tests/test_api.py -v
+            - name: Build Docker image
+        run: |
+          docker build -t credit-risk-api .    
