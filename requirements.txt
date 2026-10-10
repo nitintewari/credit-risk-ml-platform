@@ -15,4 +15,4 @@ httpx
 
 matplotlib
 jupyter
-psycopg2-binary
+psycopg[binary]
