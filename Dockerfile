@@ -11,9 +11,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-COPY artifacts/ ./artifacts/
+COPY data/ ./data/
 
 ENV PYTHONPATH=/app/src
+
+# Train model and generate artifacts inside the image
+RUN python src/credit_risk/train.py
 
 EXPOSE 8000
 
