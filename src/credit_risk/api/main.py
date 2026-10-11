@@ -1,6 +1,11 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-
+import logging
+import time
+from credit_risk.monitoring import get_prediction_summary
+from fastapi import Request
+from credit_risk.drift import check_data_drift
+from credit_risk.logging_config import setup_logging
 from credit_risk.api.schemas import ApplicantRequest
 from credit_risk.database import Base, engine, get_db
 from credit_risk.explain import explain_risk
@@ -13,14 +18,32 @@ from credit_risk.repository import (
 
 
 Base.metadata.create_all(bind=engine)
+setup_logging()
 
+logger = logging.getLogger("credit_risk.api")
 
 app = FastAPI(
     title="Credit Risk API",
     version="1.0.0",
 )
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.perf_counter()
 
+    response = await call_next(request)
+
+    duration = time.perf_counter() - start_time
+
+    logger.info(
+        "%s %s - status=%s - duration=%.3fs",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration,
+    )
+
+    return response
 @app.get("/")
 def health_check():
     return {"status": "Credit Risk API is running"}
@@ -41,6 +64,12 @@ def predict(
         applicant_data=applicant_data,
         prediction_result=prediction,
     )
+    logger.info(
+    "Prediction created - id=%s - risk=%s - probability=%.4f",
+    record.id,
+    prediction["risk_label"],
+    prediction["default_probability"],
+)
 
     return {
         **prediction,
@@ -71,3 +100,14 @@ def get_prediction_by_id(
         "threshold": record.threshold,
         "created_at": record.created_at,
     }    
+@app.get("/monitoring/summary")
+def monitoring_summary(
+    db: Session = Depends(get_db),
+):
+    return get_prediction_summary(db)    
+
+@app.get("/monitoring/drift")
+def monitoring_drift(
+    db: Session = Depends(get_db),
+):
+    return check_data_drift(db)    

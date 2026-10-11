@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from credit_risk.baseline import save_monitoring_baseline
 import joblib
 import numpy as np
 
@@ -45,6 +45,8 @@ def train():
         random_state=42,
         stratify=y_train,
     )
+    # Save training-data statistics for future drift monitoring
+    save_monitoring_baseline(X_train_core)
 
     # 4. Build base XGBoost pipeline
     base_model = build_model()
