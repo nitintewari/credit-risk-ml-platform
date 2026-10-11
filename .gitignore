@@ -41,3 +41,12 @@ build/
 dist/
 *.egg-info/
 requirements-lock.txt
+# MLflow generated files
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Frontend local/generated files
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
