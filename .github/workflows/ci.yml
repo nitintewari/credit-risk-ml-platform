@@ -47,7 +47,8 @@ jobs:
           PYTHONPATH: src
         run: |
           pytest tests/test_api.py -v
-            - name: Set up Node.js
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -62,8 +63,8 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: https://credit-risk-ml-platform-urlf.onrender.com
-        run: npm run build    
-      
+        run: npm run build
+
       - name: Build Docker image
         run: |
           docker build -t credit-risk-api .
