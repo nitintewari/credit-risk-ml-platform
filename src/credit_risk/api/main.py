@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 import logging
 import time
+from fastapi.middleware.cors import CORSMiddleware
 from credit_risk.monitoring import get_prediction_summary
 from fastapi import Request
 from credit_risk.drift import check_data_drift
@@ -26,7 +27,15 @@ app = FastAPI(
     title="Credit Risk API",
     version="1.0.0",
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.perf_counter()
