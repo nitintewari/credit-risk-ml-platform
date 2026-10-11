@@ -31,6 +31,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "https://credit-risk-ml-platform-1.onrender.com",
     ],
     allow_credentials=False,
     allow_methods=["*"],
